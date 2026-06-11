@@ -1,0 +1,59 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: boutique-appset
+  namespace: argocd
+spec:
+  generators:
+  - list:
+      elements:
+      - env: dev
+        cluster: k8s-harbor-cluster
+        url: https://13.229.80.117:6443
+        helmBranch: develop
+        helmPath: dev
+        namespace: boutique-dev
+      - env: staging
+        cluster: k8s-gitlab-cluster
+        url: https://13.212.109.239:6443
+        helmBranch: release/staging
+        helmPath: staging
+        namespace: boutique-staging
+      - env: prod
+        cluster: k8s-aws-cluster
+        url: https://k8s-api-nlb-be2653f4f4dc07c2.elb.ap-southeast-1.amazonaws.com:6443
+        helmBranch: main
+        helmPath: prod
+        namespace: boutique-prod
+  template:
+    metadata:
+      name: 'boutique-{{env}}'
+      labels:
+        app: online-boutique
+        env: '{{env}}'
+    spec:
+      destination:
+        namespace: '{{namespace}}'
+        server: '{{url}}'
+      project: online-boutique
+      source:
+        repoURL: git@github.com:BubbleTea1234/online-boutique-helm.git
+        targetRevision: '{{helmBranch}}'
+        path: '{{helmPath}}'
+        helm:
+          valueFiles:
+          - values.yaml
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        retry:
+          limit: 3
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m
+        syncOptions:
+        - CreateNamespace=true
+        - ApplyOutOfSyncOnly=true
+        - ServerSideApply=true
