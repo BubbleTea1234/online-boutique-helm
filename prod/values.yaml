@@ -19,7 +19,7 @@
 images:
   repository: 54.179.178.241:8081/prod
   # Overrides the image tag whose default is the chart appVersion.
-  tag: build-13-48d6d5a
+  tag: build-14-18ba9d3
 
 serviceAccounts:
   # Specifies whether service accounts should be created.
