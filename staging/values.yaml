@@ -19,7 +19,7 @@
 images:
   repository: 54.179.178.241:8081/staging
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: build-19-18ba9d3
 
 serviceAccounts:
   # Specifies whether service accounts should be created.
